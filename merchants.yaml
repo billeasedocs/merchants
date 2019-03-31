@@ -4,8 +4,6 @@ info:
   title: BE Merchants. Transactions
   description: |
     
-    ![Diagram](./images/account_connect.png)
-    
     ## Merchant Registration
     You have to register as a merchant in the [Merchant's portal](https://merchants.billease.ph).
 
@@ -945,7 +943,15 @@ tags:
 - name: ping
   description: Information about service
 - name: Transactions
-  description: Transactions' operations
+  description: |
+    Transactions' operations
+ 
+    Standard transaction
+      ![Diagram](./images/account_connect.png)
+
+    Quick transaction
+      ![Diagram](./images/account_connect.png)
+
 - name: Account
   description: Connect Billiease customer account
 - name: Installment
