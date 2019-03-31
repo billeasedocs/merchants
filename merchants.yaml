@@ -3,7 +3,8 @@ openapi: 3.0.2
 info:
   title: BE Merchants. Transactions
   description: |
-    # Billease Merchants. Transactions API
+    
+    ![Diagram](./images/account_connect.png)
     
     ## Merchant Registration
     You have to register as a merchant in the [Merchant's portal](https://merchants.billease.ph).
