@@ -24,7 +24,7 @@ info:
     email: api-info@billease.ph
   version: 1.0.0
   x-logo:
-      url: 'images/billease-logo.png'
+      url: 'https://billeasedocs.github.io/merchants/images/billease-logo.png'
       altText: Billease
 servers:
 - url: http://{domain}.web.lt:{port}/trx-api/v1
@@ -126,6 +126,7 @@ paths:
       summary: Connect customer account
       description: |
         Connect Billiase customer account
+        ![Diagram](./images/account_connect.png)
       operationId: connectAccount
       requestBody:
         description: Account information
@@ -218,9 +219,11 @@ paths:
         type: string
   /trx/checkout:
     summary: Initial point for the transaction
-    description: At this point client selected Billease as a payment method on the
+    description: |
+      At this point client selected Billease as a payment method on the
       merchants' site. Merchant has to prepare POST request and redirect the customer
       to the Billease payment system.
+      ![Diagram](./images/simple_transaction.png)
     post:
       tags:
       - Transactions
