@@ -1,0 +1,948 @@
+---
+openapi: 3.0.2
+info:
+  title: BE Merchants. Transactions
+  description: |
+    # Billease Merchants. Transactions API
+    
+    ## Merchant Registration
+    You have to register as a merchant in the [Merchant's portal](https://merchants.billease.ph).
+
+    ## Security
+    You will need the security key for integration with Billease API. You can download it on the [Merchant's portal](https://merchants.billease.ph).
+
+    ## Environments
+    ### Sandbox
+    https://sandbox.billiease.ph
+
+    ### Production
+    https://payments.billiease.ph
+
+  contact:
+    name: IT Department
+    url: https://www.billease.ph
+    email: api-info@billease.ph
+  version: 1.0.0
+  x-logo:
+      url: 'images/billease-logo.png'
+      altText: Billease
+servers:
+- url: http://{domain}.web.lt:{port}/trx-api/v1
+  description: Server URL
+  variables:
+    domain:
+      default: trx
+      description: Transactions API endpoint
+    port:
+      default: "80"
+      description: Production port
+paths:
+  /ping:
+    summary: Information about service
+    description: Get information about service
+    get:
+      tags:
+      - ping
+      summary: Information about service
+      description: Get information about service
+      operationId: ping
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ping'
+              examples:
+                ok:
+                  value:
+                    nam: api name
+                    env: prod
+                    ver: 1.0.1
+                    srv: 2018-10-25T13:12:01
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message'
+              examples:
+                Unauthorized:
+                  value:
+                    message: Unauthorized
+        500:
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - api_key: []
+  /trx/{id}/status:
+    summary: Transaction status
+    description: Get transaction status
+    get:
+      tags:
+      - Transactions
+      summary: Get transaction status
+      operationId: getStatus
+    parameters:
+    - name: id
+      in: path
+      description: Transaction ID
+      required: true
+  /trx/{id}/update:
+    summary: Update transaction
+    description: Finish checkout/payment process
+    post:
+      tags:
+      - Transactions
+      summary: Update transaction
+      operationId: updateTransaction
+    parameters:
+    - name: id
+      in: path
+      description: Transaction ID
+      required: true
+  /trx/{id}/cancel:
+    summary: Cancel transaction
+    description: Cancel the transaction
+    post:
+      tags:
+      - Transactions
+      summary: Cancel transaction
+      operationId: cancelTransaction
+    parameters:
+    - name: id
+      in: path
+      description: Transaction ID
+      required: true
+      schema:
+        type: string
+  /acc/connect:
+    post:
+      tags:
+      - Account
+      summary: Connect customer account
+      description: |
+        Connect Billiase customer account
+      operationId: connectAccount
+      requestBody:
+        description: Account information
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/accAccount'
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/accAccountResponse'
+        400:
+          description: |-
+            Bad Request.
+
+            Payload is incorrect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message'
+              examples:
+                Unauthorized:
+                  value:
+                    message: Unauthorized
+        500:
+          description: |-
+            Internal Server Error.
+
+            Some error in the Billease payment system.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /acc/{id}/deactivate:
+    summary: Deactivate connection of accounts
+    description: Delete customer token
+    post:
+      tags:
+      - Account
+      summary: Deactivate connection
+      description: Deactivate connect with customer Billiease account
+      operationId: deactivateConnect
+      responses:
+        200:
+          description: OK
+        400:
+          description: |-
+            Bad Request.
+
+            Payload is incorrect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message'
+              examples:
+                Unauthorized:
+                  value:
+                    message: Unauthorized
+        500:
+          description: |-
+            Internal Server Error.
+
+            Some error in the Billease payment system.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    parameters:
+    - name: id
+      in: path
+      description: Token ID
+      required: true
+      schema:
+        type: string
+  /trx/checkout:
+    summary: Initial point for the transaction
+    description: At this point client selected Billease as a payment method on the
+      merchants' site. Merchant has to prepare POST request and redirect the customer
+      to the Billease payment system.
+    post:
+      tags:
+      - Transactions
+      summary: Create transaction
+      description: |-
+        - Start transaction
+        - Forward customer to the Billease checkout page
+      operationId: createTransaction
+      requestBody:
+        description: Information about Transaction
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/trx'
+        required: true
+      responses:
+        200:
+          description: OK
+        400:
+          description: |-
+            Bad Request.
+
+            POST request has the mistakes.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message'
+              examples:
+                Unauthorized:
+                  value:
+                    message: Unauthorized
+        500:
+          description: |-
+            Internal Server Error.
+
+            Some error in the Billease payment system.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      security:
+      - api_key: []
+  /inst/installments:
+    post:
+      tags:
+      - Installment
+      summary: Get installments options
+      description: Get available options for the installment
+      operationId: getInstallments
+      requestBody:
+        description: Installment request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/instRequest'
+        required: true
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/instResponse'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/message'
+              examples:
+                Unauthorized:
+                  value:
+                    message: Unauthorized
+        500:
+          description: Internal Server Error
+components:
+  schemas:
+    ping:
+      title: Ping
+      description: Information about service
+      type: object
+      properties:
+        nam:
+          description: Name of the service
+          type: string
+        env:
+          description: 'Environment: prod;uat;dev; sandbox'
+          enum:
+          - prod
+          - uat
+          - staging
+          - dev
+          - sandbox
+        ver:
+          description: Service version
+          type: string
+        srv:
+          format: date-time
+          description: Server timestamp
+          type: string
+      example:
+        nam: trx-api
+        env: prod
+        ver: 1.0.1
+        srv: 2018-10-25T13:12:01
+    message:
+      title: Root Type for message
+      description: Some message from the server
+      required:
+      - message
+      type: object
+      properties:
+        message:
+          description: Message field
+          type: string
+      example: |-
+        {
+            "message": "no Route matched with those values"
+        }
+    error:
+      title: main error type
+      description: Error object
+      required:
+      - error
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/error_description'
+          description: Error object
+      example:
+        error:
+          code: some text
+          message: some text
+          data:
+            field_1:
+            - error message 1
+            - error message 2
+            field_2:
+            - error message
+    pages:
+      description: pagination type
+      required:
+      - current
+      type: object
+      properties:
+        count:
+          format: int32
+          description: Total number of pages
+          type: integer
+        previous:
+          format: int32
+          description: Previous page number
+          type: integer
+        current:
+          format: int32
+          description: Current page
+          type: integer
+        next:
+          format: int32
+          description: Next page number
+          type: integer
+      example:
+        count: 75
+        previous: 4
+        current: 5
+        next: 6
+    error_description:
+      title: error description type
+      description: Error description
+      type: object
+      properties:
+        code:
+          description: Error code
+          type: string
+        message:
+          description: Main error message
+          type: string
+        data:
+          description: Error data
+          type: object
+          additionalProperties:
+            description: Field error messages
+            type: array
+            items:
+              type: string
+    trxItems:
+      title: Root Type for trxItems
+      description: Transaction Items
+      required:
+      - price
+      type: object
+      properties:
+        id:
+          format: int32
+          type: integer
+        trx_id:
+          format: int32
+          type: integer
+        code:
+          type: string
+        item:
+          type: string
+        price:
+          type: number
+        quantity:
+          format: int32
+          type: integer
+        currency:
+          type: string
+        url_item:
+          type: string
+        url_img:
+          type: string
+        category:
+          type: string
+        seller_id:
+          type: string
+        item_type:
+          type: string
+      example:
+        id: 1
+        trx_id: 1
+        code: 123e4567-e89b-12d3-a456-426655440000
+        item: iPhone Xs
+        price: 10000
+        quantity: 1
+        currency: PHP
+        url_item: http://example.com/item.html
+        url_img: http://example.com/item.png
+        category: mobile
+        seller_id: abc
+        item_type: item
+    trx:
+      title: Root Type for trxRead
+      description: Transaction
+      required:
+      - shop_id
+      - merchant_id
+      - amount
+      - currency
+      - items
+      - sellers
+      - customer
+      - callbackapi_url
+      - order_ir
+      type: object
+      properties:
+        shop_id:
+          format: int32
+          description: Shop ID
+          type: integer
+        amount:
+          description: Transaction amount
+          type: number
+        currency:
+          description: "Currency. \n\n'PHP' - dafault currency"
+          type: string
+        merchant_id:
+          format: int32
+          description: Merchant ID
+          type: integer
+        items:
+          description: Items
+          type: array
+          items:
+            $ref: '#/components/schemas/trxItems'
+        sellers:
+          description: Sellers
+          type: array
+          items:
+            $ref: '#/components/schemas/trxSellers'
+        customer:
+          $ref: '#/components/schemas/trxCustomer'
+          description: Customer
+        callbackapi_url:
+          description: 'Merchant callback API. '
+          type: string
+        order_ir:
+          description: Order ID
+          type: string
+      example:
+        shop_id: 88
+        amount: 34.84
+        currency: some text
+        merchant_id: 66
+        items:
+        - id: 44
+          trx_id: 63
+          code: some text
+          item: some text
+          price: 42
+          quantity: 84
+          currency: some text
+          url_item: some text
+          url_img: some text
+          category: some text
+          seller_id: some text
+          item_type: some text
+        - id: 36
+          trx_id: 91
+          code: some text
+          item: some text
+          price: 43
+          quantity: 71
+          currency: some text
+          url_item: some text
+          url_img: some text
+          category: some text
+          seller_id: some text
+          item_type: some text
+        sellers:
+        - code: some text
+          seller_name: some text
+          url: some text
+          email: some text
+          phone: some text
+          country: some text
+          province: some text
+          city: some text
+          barangay: some text
+          street: some text
+          address: some text
+        - code: some text
+          seller_name: some text
+          url: some text
+          email: some text
+          phone: some text
+          country: some text
+          province: some text
+          city: some text
+          barangay: some text
+          street: some text
+          address: some text
+        customer:
+          full_name: some text
+          email: some text
+          phone: some text
+          adr_billing:
+            addr_type: {}
+            country: some text
+            province: some text
+            city: some text
+            barangay: some text
+            street: some text
+            address: some text
+          adr_shipping:
+            addr_type: {}
+            country: some text
+            province: some text
+            city: some text
+            barangay: some text
+            street: some text
+            address: some text
+          last_name: some text
+          first_name: some text
+        callbackapi_url: some text
+        order_ir: some text
+    trxSellers:
+      title: Root Type for trxSellers
+      description: Information about seller
+      required:
+      - code
+      - seller_name
+      type: object
+      properties:
+        code:
+          description: Unique seller's code
+          type: string
+        seller_name:
+          description: Seller name
+          type: string
+        url:
+          description: Web site
+          type: string
+        email:
+          description: email
+          type: string
+        phone:
+          description: Contact phone
+          type: string
+        country:
+          description: Country
+          type: string
+        province:
+          description: Province name
+          type: string
+        city:
+          description: City name
+          type: string
+        barangay:
+          description: Barangay name
+          type: string
+        street:
+          description: Street
+          type: string
+        address:
+          description: Address in one line
+          type: string
+      example:
+        code: ALPHABET123
+        seller_name: Alphabet inc.
+        url: http://example.com
+        email: info@example.com
+        phone: +639054196316
+        country: PH
+        province: NRC
+        city: Manila
+        barangay: Makati
+        street: Paseo de Roxas 104
+        address: Address in one line
+    trxCustomer:
+      title: Root Type for trxCustomer
+      description: Customer
+      required:
+      - full_name
+      - email
+      - phone
+      type: object
+      properties:
+        full_name:
+          description: Customer full name
+          type: string
+        email:
+          description: Email
+          type: string
+        phone:
+          description: phone
+          type: string
+        adr_billing:
+          $ref: '#/components/schemas/trxCustomerAddress'
+          description: Billing address
+        adr_shipping:
+          $ref: '#/components/schemas/trxCustomerAddress'
+          description: Shipping address
+        last_name:
+          description: Last name
+          type: string
+        first_name:
+          description: First name
+          type: string
+      example:
+        full_name: Vitalii Sharavara
+        email: sharavara@example.com
+        phone: +639054194316
+        adr_billing:
+          addr_type: billing
+          country: PHP
+          province: NCR
+          city: Manila
+          barangay: Makati
+          street: Paseo de Roxas 104
+          address: Address in one line
+        adr_shipping:
+          addr_type: shipping
+          country: PHP
+          province: NCR
+          city: Manila
+          barangay: Makati
+          street: Paseo de Roxas 104
+          address: Address in one line
+    trxCustomerAddress:
+      title: Root Type for trxCustomerAddress
+      description: Customer address
+      type: object
+      properties:
+        addr_type:
+          description: Address type
+          enum:
+          - billing
+          - shipping
+        country:
+          type: string
+        province:
+          type: string
+        city:
+          type: string
+        barangay:
+          type: string
+        street:
+          type: string
+        address:
+          type: string
+      example:
+        addr_type: billing
+        country: PHP
+        province: NCR
+        city: Manila
+        barangay: Makati
+        street: Paseo de Roxas 104
+        address: Address in one line
+    accAccount:
+      title: Root Type for accAccount
+      description: Information about Billiease customer account
+      required:
+      - email
+      - url_callbackapi
+      - url_redirect
+      - internal_user_id
+      type: object
+      properties:
+        email:
+          description: Customer email (Billease login)
+          type: string
+        phone:
+          description: Customer mobile phone
+          type: string
+        url_callbackapi:
+          description: Merchant's callback API (POST). Customer authorization token
+            will be sent to this endpoint
+          type: string
+        url_redirect:
+          description: Customer will be redirected to this URL after the authorization.
+          type: string
+        internal_user_id:
+          description: User ID in the merchant's system
+          type: string
+      example:
+        email: user@example.com
+        phone: +639054194316
+        url_callbackapi: http://example.com/api/get
+        url_redirect: http://example.com
+    accAccountResponse:
+      title: Root Type for accAccountResponse
+      description: Response in case of success
+      required:
+      - billease_url
+      type: object
+      properties:
+        billease_url:
+          description: Redirect URL
+          type: string
+      example:
+        billease_url: http://sandbox.billease.ph/api/connect/id?=uuid
+    instRequest:
+      title: Root Type for instRequest
+      description: 'Show available installments options for the current item '
+      required:
+      - amount
+      - items
+      type: object
+      properties:
+        amount:
+          format: double
+          description: Total items amount
+          type: number
+        currency:
+          description: |-
+            Currency.
+
+            `PHP` by default
+          type: string
+        items:
+          description: Items
+          type: array
+          items:
+            $ref: '#/components/schemas/instItem'
+      example:
+        amount: 10000.56
+        currency: PHP
+        items:
+        - id: SKU123
+          name: MacBook Pro 15
+          price: 1000.34
+          url: http://example.com/apple/macbook
+          type: laptop
+          quantity: 1
+        - id: SKU987
+          name: How to make a million dollars quickly
+          price: 1000.34
+          url: http://example.com/apple/book
+          type: book
+          quantity: 1
+    instItem:
+      title: Root Type for instItem
+      description: Item of installment request
+      required:
+      - id
+      - name
+      - price
+      - quantity
+      type: object
+      properties:
+        id:
+          description: Item ID (SKU)
+          type: string
+        name:
+          description: Item name
+          type: string
+        price:
+          description: Price per item
+          type: number
+        url:
+          description: Item URL
+          type: string
+        type:
+          description: Type or Category of the item (book, laptop, mobile, etc.)
+          type: string
+        quantity:
+          format: int32
+          description: Number of items
+          type: integer
+      example:
+        id: SKU123
+        name: macBook Pro 15
+        price: 1000.34
+        url: http://example.com/apple/macbook
+        type: laptop
+        quantity: 1
+    instResponse:
+      title: Root Type for instResponse
+      description: Instalment options
+      required:
+      - installments
+      type: object
+      properties:
+        title:
+          description: Message or title
+          type: string
+        installments:
+          description: Available installment plans
+          type: array
+          items:
+            $ref: '#/components/schemas/instInstallment'
+      example:
+        title: These are available installment options for this order
+        installments:
+        - currency: PHP
+          down_payment: 2000.1
+          name: Fast and Easy (1 month)
+          amount: 50000.5
+          installment_amount: 3000.4
+          rate: 2.4
+          monthly_payment: 10000
+          tenure: 1
+          id: XYZ
+        - currency: PHP
+          down_payment: 2000.1
+          name: Fast and Easy (3 month)
+          amount: 50000.5
+          installment_amount: 3000.4
+          rate: 2.4
+          monthly_payment: 10000
+          tenure: 3
+          id: ABC
+    instInstallment:
+      title: Root Type for instInstallment
+      description: Installment
+      required:
+      - amount
+      - id
+      type: object
+      properties:
+        currency:
+          description: |-
+            Currency
+
+            `PHP` by default
+          type: string
+        down_payment:
+          format: double
+          description: Down payment
+          type: number
+        name:
+          description: Name of the installment plan
+          type: string
+        amount:
+          format: double
+          description: Order amount
+          type: number
+        installment_amount:
+          format: double
+          description: Total installment amount
+          type: number
+        rate:
+          format: double
+          description: Rate
+          type: number
+        monthly_payment:
+          format: int32
+          description: Monthly payment
+          type: integer
+        tenure:
+          format: int32
+          description: Tenure (months)
+          type: integer
+        id:
+          description: Installment plan IT
+          type: string
+      example:
+        currency: PHP
+        down_payment: 2000.1
+        name: Fast and Easy (1 month)
+        amount: 50000.5
+        installment_amount: 3000.4
+        rate: 2.4
+        monthly_payment: 10000
+        tenure: 1
+        id: XYZ
+  securitySchemes:
+    api_key:
+      type: apiKey
+      description: API key
+      name: x-api-key
+      in: header
+tags:
+- name: ping
+  description: Information about service
+- name: Transactions
+  description: Transactions' operations
+- name: Account
+  description: Connect Billiease customer account
+- name: Installment
+  description: Information about available installment options
