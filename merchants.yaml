@@ -944,11 +944,11 @@ tags:
   description: |
     Transactions' operations
  
-    * Standard transaction
+    * **Standard transaction**
 
       ![Diagram](./images/standard_transaction.png)
 
-    * Quick transaction
+    * **Quick transaction**
 
       ![Diagram](./images/quick_transaction.png)
 
