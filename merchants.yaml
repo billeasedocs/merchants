@@ -945,7 +945,7 @@ tags:
     Transactions' operations
  
     * Standard transaction
-    
+
       ![Diagram](./images/standard_transaction.png)
 
     * Quick transaction
@@ -955,7 +955,8 @@ tags:
 - name: Account
   description: |
     Connect Billiease customer account
-    ![Diagram](.images/account_connect.png)
+
+    ![Diagram](./images/account_connect.png)
 
 - name: Installment
   description: Information about available installment options
