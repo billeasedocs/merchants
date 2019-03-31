@@ -126,7 +126,7 @@ paths:
       summary: Connect customer account
       description: |
         Connect Billiase customer account
-        ![Diagram](./images/account_connect.png)
+        ![Diagram](https://billeasedocs.github.io/merchants/images/account_connect.png)
       operationId: connectAccount
       requestBody:
         description: Account information
@@ -223,7 +223,7 @@ paths:
       At this point client selected Billease as a payment method on the
       merchants' site. Merchant has to prepare POST request and redirect the customer
       to the Billease payment system.
-      ![Diagram](./images/simple_transaction.png)
+      ![Diagram](https://billeasedocs.github.io/merchants/images/simple_transaction.png)
     post:
       tags:
       - Transactions
